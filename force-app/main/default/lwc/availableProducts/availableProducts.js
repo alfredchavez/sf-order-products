@@ -3,6 +3,7 @@ import getAvailableProducts from "@salesforce/apex/AvailableProductsController.g
 import addProductToOrder from "@salesforce/apex/AvailableProductsController.addProductToOrder"
 import { MessageContext, publish } from "lightning/messageService";
 import refreshMessageChannel from '@salesforce/messageChannel/RefreshMessageChannel__c';
+import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
 const ROW_ACTIONS = [
   {label: "Add to Order", name: "add_to_order"}
@@ -31,7 +32,18 @@ export default class AvailableProducts extends LightningElement {
           id: pbe.id
         }));
       })
-      .catch((err) => console.error("Some err", err));
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  showNotification(message, isError=false) {
+    const event = new ShowToastEvent({
+      title: isError ? "Unsuccessful operation": "Successful operation",
+      message: message,
+      variant: isError ? "error" : "success",
+    })
+    this.dispatchEvent(event);
   }
 
   handleAddToOrder(row) {
@@ -39,10 +51,13 @@ export default class AvailableProducts extends LightningElement {
     const orderId = this.recordId;
     addProductToOrder({productId, orderId})
       .then(() => {
-        console.log("finished to add :)")
+        this.showNotification("Product was correctly added to this Order");
         publish(this.messageContext, refreshMessageChannel, {message: "refresh-order-products"})
       })
-      .catch(err => console.error(err))
+      .catch(err => {
+        console.error(err);
+        this.showNotification("Product could not be added to this Order", true);
+      })
   }
   handleRowAction(event) {
     const actionName = event.detail.action.name;

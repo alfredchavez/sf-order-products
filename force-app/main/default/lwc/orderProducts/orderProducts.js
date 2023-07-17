@@ -39,7 +39,6 @@ export default class OrderProducts extends LightningElement {
           total_price: orderProduct.totalPrice,
           quantity: orderProduct.quantity,
         }));
-        console.log("obtained products");
       })
       .catch((err) => console.error("Some err", err));
   }
