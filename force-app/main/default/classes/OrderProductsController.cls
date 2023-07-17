@@ -26,6 +26,29 @@ public with sharing class OrderProductsController {
         }
     }
 
+    @AuraEnabled
+    public static OrderForDisplay getOrder(Id orderId) {
+        try {
+            Order order = OrderService.getOrder(orderId);
+            return new OrderForDisplay(order);
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+
+    public class OrderForDisplay {
+        @AuraEnabled
+        public Id id {get;set;}
+
+        @AuraEnabled
+        public String status {get; set;}
+
+        public OrderForDisplay(Order order) {
+            this.id = order.Id;
+            this.status = order.Status;
+        }
+    }
+
 
     public class OrderProduct {
         @AuraEnabled

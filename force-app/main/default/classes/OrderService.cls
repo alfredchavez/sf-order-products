@@ -22,4 +22,10 @@ public with sharing class OrderService {
         return false;
     }
 
+    public static Order getOrder(Id orderId) {
+        List<Order> orders = [SELECT Id, Status FROM Order WHERE Id = :orderId LIMIT 1];
+        if(orders.isEmpty()) throw new QueryException('Order does not exist');
+        return orders[0];
+    }
+
 }
