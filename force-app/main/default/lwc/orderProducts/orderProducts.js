@@ -1,6 +1,8 @@
-import { api, LightningElement, track } from "lwc";
+import { api, LightningElement, track, wire } from "lwc";
 import getOrderProducts from "@salesforce/apex/OrderProductsController.getOrderProducts"
 import activateOrder from "@salesforce/apex/OrderProductsController.activateOrder"
+import { MessageContext, subscribe, unsubscribe } from "lightning/messageService";
+import refreshMessageChannel from '@salesforce/messageChannel/RefreshMessageChannel__c';
 
 const DATA_COLUMNS = [
   { label: "Name", fieldName: "name", type: "text" },
@@ -12,8 +14,22 @@ export default class OrderProducts extends LightningElement {
   @track data = [];
   columns = DATA_COLUMNS;
   @api recordId;
+  subscription = null;
+
+  @wire(MessageContext)
+  messageContext;
 
   connectedCallback() {
+    this.subscribeToMessageChannel();
+    this.getAndUpdateOrderProducts();
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.unsubscribeToMessageChanel();
+  }
+
+  getAndUpdateOrderProducts() {
     getOrderProducts({ orderId: this.recordId })
       .then((result) => {
         this.data = result.map((orderProduct) => ({
@@ -26,6 +42,22 @@ export default class OrderProducts extends LightningElement {
         console.log("obtained products");
       })
       .catch((err) => console.error("Some err", err));
+  }
+
+  subscribeToMessageChannel() {
+    if(this.subscription) {
+      return;
+    }
+    this.subscription = subscribe(this.messageContext, refreshMessageChannel, (message) => {
+      if(message.message === "refresh-order-products") {
+        this.getAndUpdateOrderProducts();
+      }
+    });
+  }
+
+  unsubscribeToMessageChanel() {
+    unsubscribe(this.subscription);
+    this.subscription = null;
   }
 
   handleActivateButtonClick() {

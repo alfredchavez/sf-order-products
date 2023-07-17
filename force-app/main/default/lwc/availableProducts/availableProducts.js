@@ -1,6 +1,8 @@
-import { LightningElement, api, track } from "lwc";
+import { LightningElement, api, wire } from "lwc";
 import getAvailableProducts from "@salesforce/apex/AvailableProductsController.getAvailableProducts";
 import addProductToOrder from "@salesforce/apex/AvailableProductsController.addProductToOrder"
+import { MessageContext, publish } from "lightning/messageService";
+import refreshMessageChannel from '@salesforce/messageChannel/RefreshMessageChannel__c';
 
 const ROW_ACTIONS = [
   {label: "Add to Order", name: "add_to_order"}
@@ -13,9 +15,12 @@ const DATA_COLUMNS = [
 ];
 
 export default class AvailableProducts extends LightningElement {
-  @track data = [];
+  data = [];
   columns = DATA_COLUMNS;
   @api recordId;
+
+  @wire(MessageContext)
+  messageContext;
 
   connectedCallback() {
     getAvailableProducts({ orderId: this.recordId })
@@ -32,10 +37,10 @@ export default class AvailableProducts extends LightningElement {
   handleAddToOrder(row) {
     const productId = row.id;
     const orderId = this.recordId;
-    console.log("Add", productId, "TO", orderId)
     addProductToOrder({productId, orderId})
       .then(() => {
         console.log("finished to add :)")
+        publish(this.messageContext, refreshMessageChannel, {message: "refresh-order-products"})
       })
       .catch(err => console.error(err))
   }
