@@ -29,7 +29,6 @@ export default class OrderProducts extends LightningElement {
   }
 
   disconnectedCallback() {
-    super.disconnectedCallback();
     this.unsubscribeToMessageChanel();
   }
 

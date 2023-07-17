@@ -32,7 +32,6 @@ export default class AvailableProducts extends LightningElement {
   }
 
   disconnectedCallback() {
-    super.disconnectedCallback();
     this.unsubscribeToMessageChanel();
   }
 
@@ -42,7 +41,6 @@ export default class AvailableProducts extends LightningElement {
     }
     this.subscription = subscribe(this.messageContext, refreshMessageChannel, (message) => {
       if (message.message === "order-is-activated") {
-        console.log("ORDER IS ACTIVATED", message, message.message);
         this.areButtonsDisabled = true;
         this.getAndUpdateAvailableProducts();
       }

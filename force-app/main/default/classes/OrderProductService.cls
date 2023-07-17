@@ -23,18 +23,8 @@ public with sharing class OrderProductService {
     }
 
     public static OrderItem createNewOrderProduct(Id productId, Id orderId) {
-        Order ord = [
-                SELECT Id, Pricebook2Id
-                FROM Order
-                WHERE Id = :orderId
-                LIMIT 1
-        ];
-        PricebookEntry pricebookEntry = [
-                SELECT Id, UnitPrice
-                FROM PricebookEntry
-                WHERE Product2Id = :productId AND Pricebook2Id = :ord.Pricebook2Id
-                LIMIT 1
-        ];
+        Order order = OrderService.getOrder(orderId);
+        PricebookEntry pricebookEntry = PricebookEntryService.getPricebookEntry(productId, order.Pricebook2Id);
         OrderItem orderProduct = new OrderItem();
         orderProduct.OrderId = orderId;
         orderProduct.Quantity = 1;
@@ -46,7 +36,11 @@ public with sharing class OrderProductService {
     }
 
     public static List<OrderItem> getOrderProducts(Id orderId) {
-        List<OrderItem> orderProducts = [SELECT Id, Product2.Name, UnitPrice, TotalPrice, Quantity, Product2Id FROM OrderItem WHERE OrderId=:orderId];
+        List<OrderItem> orderProducts = [
+                SELECT Id, Product2.Name, UnitPrice, TotalPrice, Quantity, Product2Id
+                FROM OrderItem
+                WHERE OrderId=:orderId
+        ];
         return orderProducts;
     }
 

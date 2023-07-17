@@ -4,11 +4,7 @@
 
 public with sharing class OrderService {
     public static Order activateOrder(Id orderId) {
-        List<Order> orders = [SELECT Id FROM Order WHERE Id = :orderId LIMIT 1];
-        if (orders.isEmpty()) {
-            throw new QueryException('Order does not exist');
-        }
-        Order order = orders[0];
+        Order order = getOrder(orderId);
         order.Status = 'Activated';
         update order;
         return order;
@@ -23,7 +19,7 @@ public with sharing class OrderService {
     }
 
     public static Order getOrder(Id orderId) {
-        List<Order> orders = [SELECT Id, Status FROM Order WHERE Id = :orderId LIMIT 1];
+        List<Order> orders = [SELECT Id, Name, Pricebook2Id, Status FROM Order WHERE Id = :orderId LIMIT 1];
         if(orders.isEmpty()) throw new QueryException('Order does not exist');
         return orders[0];
     }
