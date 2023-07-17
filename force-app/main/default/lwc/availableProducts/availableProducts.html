@@ -1,3 +1,8 @@
 <template>
-    
+  <lightning-card title="Available Products" icon-name="custom:custom63">
+    <div style="max-height: 300px">
+      <lightning-datatable key-field="id" data={data} columns={columns} hide-checkbox-column="true" onrowaction={handleRowAction}>
+      </lightning-datatable>
+    </div>
+  </lightning-card>
 </template>
