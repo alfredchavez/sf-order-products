@@ -1,7 +1,7 @@
 <template>
   <lightning-card title="Order Products" icon-name="custom:custom62">
     <div class="slds-m-horizontal_medium" style="max-height: 300px; display: flex; flex-direction: column;">
-      <lightning-datatable class="slds-m-bottom_medium" key-field="id" data={data} columns={columns} hide-checkbox-column="true" onrowaction={handleRowAction}>
+      <lightning-datatable class="slds-m-bottom_medium" key-field="id" data={data} columns={columns} sorted-by={sortBy} sorted-direction={sortDirection} onsort={handleSortClick} hide-checkbox-column="true" onrowaction={handleRowAction}>
       </lightning-datatable>
       <div class="slds-align_absolute-center" style="width: 100%">
         <lightning-button variant="brand" label="Activate" onclick={handleActivateButtonClick} disabled={isActivateDisabled}></lightning-button>

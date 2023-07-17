@@ -1,4 +1,4 @@
-import { api, LightningElement, track, wire } from "lwc";
+import { api, LightningElement, wire } from "lwc";
 import getOrderProducts from "@salesforce/apex/OrderProductsController.getOrderProducts";
 import activateOrder from "@salesforce/apex/OrderProductsController.activateOrder";
 import getOrder from "@salesforce/apex/OrderProductsController.getOrder";
@@ -7,14 +7,17 @@ import refreshMessageChannel from "@salesforce/messageChannel/RefreshMessageChan
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
 const DATA_COLUMNS = [
-  { label: "Name", fieldName: "name", type: "text" },
-  { label: "Quantity", fieldName: "quantity", type: "number" },
-  { label: "Unit Price", fieldName: "unit_price", type: "currency" },
-  { label: "Total Price", fieldName: "total_price", type: "currency" }
+  { label: "Name", fieldName: "name", type: "text", sortable: "true" },
+  { label: "Quantity", fieldName: "quantity", type: "number", sortable: "true" },
+  { label: "Unit Price", fieldName: "unit_price", type: "currency", sortable: "true" },
+  { label: "Total Price", fieldName: "total_price", type: "currency", sortable: "true" }
 ];
 export default class OrderProducts extends LightningElement {
-  @track data = [];
+  data = [];
   columns = DATA_COLUMNS;
+  sortBy;
+  sortDirection;
+
   @api recordId;
   subscription = null;
   isActivateDisabled = true;
@@ -55,6 +58,21 @@ export default class OrderProducts extends LightningElement {
         console.error(err);
         this.isActivateDisabled = true;
       })
+  }
+
+  handleSortClick (event) {
+    this.sortBy = event.detail.fieldName;
+    this.sortDirection = event.detail.sortDirection;
+    this.data = this.sortedData(this.sortBy, this.sortDirection);
+  }
+
+  sortedData(sortBy, sortDirection) {
+    const newData = [...this.data];
+    newData.sort((a, b) => {
+      const direction = sortDirection === "asc" ? -1 : 1;
+      return direction * ((a[sortBy] > b[sortBy]) - (b[sortBy] > a[sortBy]));
+    })
+    return newData;
   }
 
   subscribeToMessageChannel() {

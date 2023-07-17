@@ -76,7 +76,7 @@ private class OrderServiceTest {
         List<Product2> products = [SELECT Id FROM Product2 WHERE Name =: 'Product 1' LIMIT 1];
         Order order = orders[0];
         Product2 prod = products[0];
-        Boolean included = OrderService.isProductIncluded(order.Id, prod.Id);
+        Boolean included = OrderService.isProductIncluded(order.Id, prod.Id, false);
         System.assertEquals(included, true);
     }
 
@@ -86,8 +86,21 @@ private class OrderServiceTest {
         List<Product2> products = [SELECT Id FROM Product2 WHERE Name =: 'Product 2' LIMIT 1];
         Order order = orders[0];
         Product2 prod = products[0];
-        Boolean included = OrderService.isProductIncluded(order.Id, prod.Id);
+        Boolean included = OrderService.isProductIncluded(order.Id, prod.Id, false);
         System.assertEquals(included, false);
+    }
+
+    @IsTest
+    static void testIsProductIncludedUseCached() {
+        Order order = [SELECT Id FROM Order LIMIT 1][0];
+        Product2 prod1 = [SELECT Id FROM Product2 WHERE Name =: 'Product 1' LIMIT 1][0];
+        Product2 prod2 = [SELECT Id FROM Product2 WHERE Name =: 'Product 2' LIMIT 1][0];
+        Boolean included1 = OrderService.isProductIncluded(order.Id, prod1.Id, true);
+        Boolean included2 = OrderService.isProductIncluded(order.Id, prod2.Id, true);
+        Boolean included3 = OrderService.isProductIncluded(order.Id, prod1.Id, true);
+        System.assertEquals(included1, true);
+        System.assertEquals(included2, false);
+        System.assertEquals(included3, true);
     }
 
     @IsTest

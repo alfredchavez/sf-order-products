@@ -3,12 +3,13 @@
  */
 
 public with sharing class PricebookEntryService {
-    public static List<PricebookEntry> getPricebooksAvailableForOrder(Id orderId) {
+    public static List<PricebookEntry> getPricebooksAvailableForOrder(Id orderId, String search) {
         Order order = OrderService.getOrder(orderId);
+        String searchInName = '%' + search + '%';
         List<PricebookEntry> availablePriceBookEntries = [
                 SELECT Id, Product2.Name, Product2.Id, UnitPrice
                 FROM PricebookEntry
-                WHERE Pricebook2Id = :order.Pricebook2Id
+                WHERE Pricebook2Id = :order.Pricebook2Id AND Product2.Name LIKE :searchInName
         ];
         return availablePriceBookEntries;
     }

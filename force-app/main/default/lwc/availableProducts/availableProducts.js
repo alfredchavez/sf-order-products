@@ -7,8 +7,8 @@ import refreshMessageChannel from "@salesforce/messageChannel/RefreshMessageChan
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
 const DATA_COLUMNS = [
-  { label: "Name", fieldName: "name", type: "text" },
-  { label: "List Price", fieldName: "list_price", type: "currency" },
+  { label: "Name", fieldName: "name", type: "text", sortable: "true" },
+  { label: "List Price", fieldName: "list_price", type: "currency",  sortable: "true" },
   {
     type: "button",
     initialWidth: 100,
@@ -20,6 +20,10 @@ export default class AvailableProducts extends LightningElement {
   data = [];
   areButtonsDisabled = true;
   columns = DATA_COLUMNS;
+  sortBy;
+  sortDirection;
+  searchTextValue = "";
+
   @api recordId;
   subscription = null;
 
@@ -47,6 +51,29 @@ export default class AvailableProducts extends LightningElement {
     });
   }
 
+  handleSortClick (event) {
+    this.sortBy = event.detail.fieldName;
+    this.sortDirection = event.detail.sortDirection;
+    this.data = this.sortedData(this.sortBy, this.sortDirection);
+  }
+
+  sortedData(sortBy, sortDirection) {
+    const newData = [...this.data];
+    newData.sort((a, b) => {
+      const direction = sortDirection === "asc" ? -1 : 1;
+      return direction * ((a[sortBy] > b[sortBy]) - (b[sortBy] > a[sortBy]));
+    })
+    return newData;
+  }
+
+  handleInputChange(event) {
+    this.searchTextValue = event.detail.value ?? "";
+  }
+
+  handleSearchButtonClick() {
+    this.getAndUpdateAvailableProducts();
+  }
+
   unsubscribeToMessageChanel() {
     unsubscribe(this.subscription);
     this.subscription = null;
@@ -65,7 +92,7 @@ export default class AvailableProducts extends LightningElement {
   }
 
   getAndUpdateAvailableProducts() {
-    getAvailableProducts({ orderId: this.recordId })
+    getAvailableProducts({ orderId: this.recordId, search: this.searchTextValue })
       .then((result) => {
         result.sort((a, b) => (a.alreadyAdded && b.alreadyAdded ? 0 : a.alreadyAdded ? -1 : 1));
         this.data = result.map((pbe) => ({

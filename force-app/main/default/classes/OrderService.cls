@@ -3,6 +3,9 @@
  */
 
 public with sharing class OrderService {
+    private static Boolean orderProductsCached = false;
+    private static List<OrderItem> cachedOrderProducts = new List<OrderItem>();
+
     public static Order activateOrder(Id orderId) {
         Order order = getOrder(orderId);
         order.Status = 'Activated';
@@ -10,9 +13,12 @@ public with sharing class OrderService {
         return order;
     }
 
-    public static Boolean isProductIncluded(Id orderId, Id productId) {
-        List<OrderItem> orderProducts = OrderProductService.getOrderProducts(orderId);
-        for (OrderItem oProduct : orderProducts) {
+    public static Boolean isProductIncluded(Id orderId, Id productId, Boolean useCache) {
+        if(!useCache || !orderProductsCached) {
+            cachedOrderProducts = OrderProductService.getOrderProducts(orderId);
+            orderProductsCached = true;
+        }
+        for (OrderItem oProduct : cachedOrderProducts) {
             if (productId == oProduct.Product2Id) return true;
         }
         return false;

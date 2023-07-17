@@ -53,7 +53,7 @@ private class PricebookEntryServiceTest {
     static void testGetPricebooksAvailableForOrder() {
         List<Order> orders = [SELECT Id FROM Order LIMIT 1];
         Order order = orders[0];
-        List<PricebookEntry> pricebookEntries = PricebookEntryService.getPricebooksAvailableForOrder(order.Id);
+        List<PricebookEntry> pricebookEntries = PricebookEntryService.getPricebooksAvailableForOrder(order.Id, 'Product');
         System.assertEquals(pricebookEntries.size(), 2);
     }
 

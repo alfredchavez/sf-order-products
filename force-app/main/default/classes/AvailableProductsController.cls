@@ -1,11 +1,11 @@
 public with sharing class AvailableProductsController {
     @AuraEnabled
-    public static List<Product> getAvailableProducts(Id orderId) {
+    public static List<Product> getAvailableProducts(Id orderId, String search) {
         try {
-            List<PricebookEntry> availablePricebookEntries = PricebookEntryService.getPricebooksAvailableForOrder(orderId);
+            List<PricebookEntry> availablePricebookEntries = PricebookEntryService.getPricebooksAvailableForOrder(orderId, search);
             List<Product> products = new List<Product>();
             for (PricebookEntry entry : availablePricebookEntries) {
-                products.add(new Product(entry, OrderService.isProductIncluded(orderId, entry.Product2Id)));
+                products.add(new Product(entry, OrderService.isProductIncluded(orderId, entry.Product2Id, true)));
             }
             return products;
         } catch (Exception e) {
