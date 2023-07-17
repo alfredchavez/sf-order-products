@@ -5,7 +5,7 @@ public with sharing class AvailableProductsController {
             List<PricebookEntry> availablePricebookEntries = PricebookEntryService.getPricebooksAvailableForOrder(orderId);
             List<Product> products = new List<Product>();
             for (PricebookEntry entry : availablePricebookEntries) {
-                products.add(new Product(entry));
+                products.add(new Product(entry, OrderService.isProductIncluded(orderId, entry.Product2Id)));
             }
             return products;
         } catch (Exception e) {
@@ -32,16 +32,21 @@ public with sharing class AvailableProductsController {
         @AuraEnabled
         public Decimal price { get; set; }
 
-        public Product(Id product2Id, String name, Decimal price) {
+        @AuraEnabled
+        public Boolean alreadyAdded {get;set;}
+
+        public Product(Id product2Id, String name, Decimal price, Boolean alreadyAdded) {
             this.id = product2Id;
             this.name = name;
             this.price = price;
+            this.alreadyAdded = alreadyAdded;
         }
 
-        public Product(PricebookEntry pricebookEntry) {
+        public Product(PricebookEntry pricebookEntry, Boolean alreadyAdded) {
             this.id = pricebookEntry.Product2Id;
             this.name = pricebookEntry.Product2.Name;
             this.price = pricebookEntry.UnitPrice;
+            this.alreadyAdded = alreadyAdded;
         }
 
     }

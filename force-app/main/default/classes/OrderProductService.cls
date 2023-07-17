@@ -46,7 +46,7 @@ public with sharing class OrderProductService {
     }
 
     public static List<OrderItem> getOrderProducts(Id orderId) {
-        List<OrderItem> orderProducts = [SELECT Id, Product2.Name, UnitPrice, TotalPrice, Quantity FROM OrderItem WHERE OrderId=:orderId];
+        List<OrderItem> orderProducts = [SELECT Id, Product2.Name, UnitPrice, TotalPrice, Quantity, Product2Id FROM OrderItem WHERE OrderId=:orderId];
         return orderProducts;
     }
 
