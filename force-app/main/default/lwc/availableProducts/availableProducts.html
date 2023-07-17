@@ -1,12 +1,14 @@
 <template>
   <lightning-card title="Available Products" icon-name="custom:custom63">
-    <div class="slds-m-horizontal_medium" style="max-height: 300px">
+    <div class="slds-m-horizontal_medium slds-m-bottom_medium" style="max-height: 350px;">
       <div class="slds-m-bottom_medium" style="display: flex; flex-direction: row; gap: 10px">
         <lightning-input type="text" label="Search by name:" onchange={handleInputChange}></lightning-input>
         <lightning-button class="slds-m-top_large" variant="brand" label="Search" onclick={handleSearchButtonClick}></lightning-button>
       </div>
-      <lightning-datatable key-field="id" data={data} columns={columns} sorted-by={sortBy} sorted-direction={sortDirection} onsort={handleSortClick} hide-checkbox-column="true" onrowaction={handleRowAction}>
-      </lightning-datatable>
+      <div style="height: 200px;">
+        <lightning-datatable key-field="id" data={data} columns={columns} sorted-by={sortBy} sorted-direction={sortDirection} onsort={handleSortClick} hide-checkbox-column="true" onrowaction={handleRowAction}>
+        </lightning-datatable>
+      </div>
     </div>
   </lightning-card>
 </template>
