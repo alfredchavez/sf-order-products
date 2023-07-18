@@ -21,9 +21,24 @@ public with sharing class OrderProductsController {
     public static void activateOrder(Id orderId) {
         try {
             OrderService.activateOrder(orderId);
+            sendActivationToRequestCatcher(orderId);
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }
+    }
+
+    @Future(Callout=true)
+    private static void sendActivationToRequestCatcher(Id orderId) {
+        Order order = OrderService.getOrder(orderId);
+        List<OrderItem> orderProducts = OrderProductService.getOrderProducts(orderId);
+        RequestCatcherService.ActivatePayload payload = new RequestCatcherService.ActivatePayload()
+                .accountNumber(order.Account.AccountNumber)
+                .orderNumber(order.OrderNumber)
+                .type(order.Type)
+                .status(order.Status)
+                .orderProducts(orderProducts);
+        HttpResponse response = RequestCatcherService.post(payload);
+        if(response.getStatusCode() != 200) throw new CalloutException('Obtained incorrect status code from endpoint');
     }
 
     @AuraEnabled

@@ -25,7 +25,7 @@ public with sharing class OrderService {
     }
 
     public static Order getOrder(Id orderId) {
-        List<Order> orders = [SELECT Id, Name, Pricebook2Id, Status FROM Order WHERE Id = :orderId LIMIT 1];
+        List<Order> orders = [SELECT Id, Account.AccountNumber, Type, OrderNumber, Name, Pricebook2Id, Status FROM Order WHERE Id = :orderId LIMIT 1];
         if(orders.isEmpty()) throw new QueryException('Order does not exist');
         return orders[0];
     }
