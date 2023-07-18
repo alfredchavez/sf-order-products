@@ -4,10 +4,10 @@
 
 public with sharing class RequestCatcherService {
     public static HttpResponse post(ActivatePayload body) {
-        String endpoint = request_catcher__c.getOrgDefaults().endpoint__c;
+        String ENDPOINT = 'https://alfredsf1.requestcatcher.com/test';
         HttpRequest req = new HttpRequest();
         req.setMethod('POST');
-        req.setEndpoint(endpoint);
+        req.setEndpoint(ENDPOINT);
         req.setHeader('Content-Type', 'application/json');
         req.setTimeout(5000);
         req.setBody(body.toJSONString());
