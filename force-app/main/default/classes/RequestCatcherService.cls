@@ -3,12 +3,11 @@
  */
 
 public with sharing class RequestCatcherService {
-    public static String API_URL = 'https://alfredsf1.requestcatcher.com/test';
-
     public static HttpResponse post(ActivatePayload body) {
+        String endpoint = request_catcher__c.getOrgDefaults().endpoint__c;
         HttpRequest req = new HttpRequest();
         req.setMethod('POST');
-        req.setEndpoint(API_URL);
+        req.setEndpoint(endpoint);
         req.setHeader('Content-Type', 'application/json');
         req.setTimeout(5000);
         req.setBody(body.toJSONString());
